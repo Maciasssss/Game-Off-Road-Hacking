@@ -1,104 +1,205 @@
 # 🌐 CYBER-WAR: RFID Capture the Flag
 
+<div align="center">
+
 ![Version](https://img.shields.io/badge/version-1.0.0-green)
 ![Python](https://img.shields.io/badge/python-3.x-blue)
 ![Hardware](https://img.shields.io/badge/hardware-ESP8266-orange)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-**Cyber-War** is a pervasive, real-world team game that blends physical hardware with a digital web interface. Players acting as "Agents" use physical RFID cards to interact with hardware Nodes (ESP8266), triggering hacking minigames on their smartphones to capture points, earn abilities, and dominate the network.
+**A pervasive, real-world team game blending physical hardware with digital web interfaces**
+
+[Features](#-features) • [Hardware](#-hardware-requirements) • [Setup](#-server-installation-pc) • [How to Play](#-how-to-play) • [Troubleshooting](#-troubleshooting)
+
+</div>
 
 ---
 
-## 📑 Table of Contents
-1. [Project Overview](#-project-overview)
-2. [Hardware Requirements](#-hardware-requirements)
-3. [Wiring Guide](#-wiring-guide-construction)
-4. [Server Installation](#-server-installation-pc)
-5. [Node Configuration](#-node-configuration-esp8266)
-6. [How to Play](#-how-to-play)
-7. [Troubleshooting](#-troubleshooting)
+## 🎯 Features
+
+- **Physical + Digital Gameplay** - Use RFID cards to trigger smartphone minigames
+- **Real-time Competition** - WebSocket-powered instant updates across all devices
+- **Team Strategy** - Coordinate attacks, abilities, and resource management
+- **Portable Hardware** - Battery-powered nodes for anywhere gameplay
+- **Game Master Controls** - Live scoring adjustments and match management
+
+---
+
+## 📖 Table of Contents
+
+- [Project Overview](#-project-overview)
+- [Hardware Requirements](#-hardware-requirements)
+- [Wiring Guide](#-wiring-guide)
+- [Server Installation](#-server-installation-pc)
+- [Node Configuration](#-node-configuration-esp8266)
+- [How to Play](#-how-to-play)
+- [Troubleshooting](#-troubleshooting)
 
 ---
 
 ## 🔭 Project Overview
 
-*   **The Server:** A Python Flask application running on a laptop or Raspberry Pi. It hosts the game interface, manages scores, and handles real-time communication via WebSockets.
-*   **The Nodes:** ESP8266 microcontrollers connected to RFID readers and OLED screens. These act as "Capture Points" (Alpha, Beta, Gamma) and "Base Stations".
-*   **The Client:** Players use their smartphones to log in. When they tap their card on a physical Node, the server pushes a minigame to their phone instantly.
+**Cyber-War** transforms physical spaces into competitive hacking arenas where players use real hardware to capture virtual territory.
+
+### System Architecture
+
+| Component | Description |
+|-----------|-------------|
+| **🖥️ Server** | Python Flask application managing game state, scores, and real-time WebSocket communication |
+| **📡 Nodes** | ESP8266 microcontrollers with RFID readers acting as capture points and base stations |
+| **📱 Client** | Smartphone web interface delivering instant minigames when cards are scanned |
+
+### Game Flow
+
+```mermaid
+graph LR
+    A[Player Scans Card] --> B[Node Reads RFID]
+    B --> C[Server Receives Data]
+    C --> D[Minigame Pushed to Phone]
+    D --> E[Player Solves Challenge]
+    E --> F[Points & Abilities Awarded]
+```
 
 ---
 
 ## 🛒 Hardware Requirements
 
-To build the full system (1 Base Station + 3 Game Nodes), you will need:
+### Bill of Materials
 
-*   **4x ESP8266 Boards** (NodeMCU V3 or Wemos D1 Mini recommended)
-*   **4x MFRC522 RFID Readers** (RC522)
-*   **4x OLED Screens** (0.96" I2C SSD1306 128x64)
-*   **RFID Cards/Tags** (13.56MHz MIFARE)
-*   **Jumper Wires** (Female-to-Female and Male-to-Female)
-*   **Micro USB Cables** (for power and programming)
-*   **Power Banks** (optional, to make nodes portable)
+For a complete setup (1 Base Station + 3 Capture Points):
 
-Then you can put it all together into a nice model, e.g.: terminals :) 
+| Component | Quantity | Notes |
+|-----------|----------|-------|
+| **ESP8266 Board** | 4 | NodeMCU V3 or Wemos D1 Mini recommended |
+| **MFRC522 RFID Reader** | 4 | RC522 module (13.56MHz) |
+| **OLED Display** | 4 | 0.96" I2C SSD1306 128×64 |
+| **RFID Cards/Tags** | As needed | 13.56MHz MIFARE compatible |
+| **Jumper Wires** | 1 set | Female-to-Female & Male-to-Female |
+| **Micro USB Cables** | 4 | For power and programming |
+| **Power Banks** | 4 (optional) | For portable deployment |
+
+### Optional Enhancements
+
+- 3D printed enclosures for weather resistance
+- LED status indicators
+- Buzzers for audio feedback
+
 ---
 
-## ⚡ Wiring Guide (Construction)
+## ⚡ Wiring Guide
 
-Connect the components to the ESP8266 (NodeMCU) as follows.
-> **Note:** Pin labels (D1, D2, etc.) refer to the NodeMCU silk screen.
+Connect components to the ESP8266 (NodeMCU) following these diagrams.
 
-### 1. Connecting the OLED Display (I2C)
-| OLED Pin | ESP8266 Pin | Notes |
-| :---    | :---         | :--- |
+> **⚠️ Warning:** Pin labels (D1, D2, etc.) refer to the NodeMCU silk screen labels.
+
+### OLED Display (I2C Connection)
+
+```
+┌─────────────┐
+│  OLED       │
+│  SSD1306    │
+└─────────────┘
+  VCC  GND  SCL  SDA
+   │    │    │    │
+   │    │    │    └──── D2 (GPIO 4)
+   │    │    └───────── D1 (GPIO 5)
+   │    └────────────── GND
+   └─────────────────── 3.3V
+```
+
+| OLED Pin | ESP8266 Pin | Function |
+|----------|-------------|----------|
 | **VCC** | 3.3V (or 5V) | Power |
 | **GND** | GND | Ground |
-| **SCL** | D1 (GPIO 5)  | Clock Line |
-| **SDA** | D2 (GPIO 4)  | Data Line |
+| **SCL** | D1 (GPIO 5) | I2C Clock |
+| **SDA** | D2 (GPIO 4) | I2C Data |
 
-Warning!!! remember if you have oled or the rfid working on 3.3V do not directly connect them into ESP in 5V, it will most-likly burn whole plates. Instead use the resistor or some kind of adapter. 
+### RFID Reader (SPI Connection)
 
-### 2. Connecting the RFID Reader (SPI)
-| RC522 Pin | ESP8266 Pin | Notes |
-| :---     | :---            | :--- |
-| **3.3V** | 3.3V            |⚠️ **Do NOT use 5V** |
-| **RST**  | D3 (GPIO 0)     | Reset |
-| **GND**  | GND | Ground    |
-| **IRQ**  | *Not Connected* | Interrupt (Unused) |
-| **MISO** | D6 (GPIO 12)    | Master In Slave Out |
-| **MOSI** | D7 (GPIO 13)    | Master Out Slave In |
-| **SCK**  | D5 (GPIO 14)    | Serial Clock |
+```
+┌─────────────┐
+│  RC522      │
+│  RFID       │
+└─────────────┘
+ 3.3V RST GND MISO MOSI SCK SDA
+  │    │   │   │    │    │   │
+  │    │   │   │    │    │   └─── D4 (GPIO 2)
+  │    │   │   │    │    └─────── D5 (GPIO 14)
+  │    │   │   │    └──────────── D7 (GPIO 13)
+  │    │   │   └───────────────── D6 (GPIO 12)
+  │    │   └───────────────────── GND
+  │    └───────────────────────── D3 (GPIO 0)
+  └────────────────────────────── 3.3V ⚠️ NOT 5V!
+```
+
+| RC522 Pin | ESP8266 Pin | Function |
+|-----------|-------------|----------|
+| **3.3V** | 3.3V | Power **⚠️ Do NOT use 5V** |
+| **RST** | D3 (GPIO 0) | Reset |
+| **GND** | GND | Ground |
+| **IRQ** | *Not Connected* | Interrupt (Unused) |
+| **MISO** | D6 (GPIO 12) | Master In Slave Out |
+| **MOSI** | D7 (GPIO 13) | Master Out Slave In |
+| **SCK** | D5 (GPIO 14) | Serial Clock |
 | **SDA (SS)** | D4 (GPIO 2) | Slave Select |
 
-### 3. Construction Tips
-1.  **Breadboard First:** Assemble everything on a breadboard to test connections before soldering.
-2.  **Power:** The ESP8266 can power the OLED and RFID reader via its 3.3V pin, but ensure your USB power source is stable.
-3.  **Housing:** Use small plastic boxes or 3D printed cases to protect the electronics during gameplay.
+### 🔌 Construction Tips
+
+> **⚠️ Critical:** If your OLED or RFID module requires 3.3V, do NOT connect directly to ESP8266's 5V pin. Use a voltage divider with resistors or a logic level converter to prevent damage.
+
+1. **Prototype First** - Assemble on a breadboard and test all connections before soldering
+2. **Power Stability** - Ensure your USB power source provides stable current for all components
+3. **Cable Management** - Use short jumper wires to minimize signal interference
+4. **Enclosures** - 3D print or use plastic project boxes to protect electronics during gameplay
 
 ---
 
 ## 💻 Server Installation (PC)
 
-Run the game server on a Laptop or Raspberry Pi connected to the same Wi-Fi network as the ESP8266 nodes.
+Deploy the game server on a laptop or Raspberry Pi connected to the same WiFi network as your ESP8266 nodes.
 
-### 1. Prerequisites
-*   Install [Python 3.8+](https://www.python.org/downloads/).
-*   Install [Git](https://git-scm.com/downloads).
+### Prerequisites
 
-### 2. Installation Steps
-Open your terminal (Command Prompt or PowerShell) and run:
+- [Python 3.8+](https://www.python.org/downloads/)
+- [Git](https://git-scm.com/downloads)
+- WiFi network with static IP for the server (recommended)
+
+### Installation Steps
+
+<details>
+<summary><b>Windows</b></summary>
+
+```powershell
+# 1. Clone the repository
+git clone https://github.com/Maciasssss/Game-Off-Road-Hacking.git
+cd Game-Off-Road-Hacking
+
+# 2. Create virtual environment
+python -m venv venv
+venv\Scripts\activate
+
+# 3. Install dependencies
+pip install flask flask-socketio eventlet
+
+# 4. Run the server
+python app.py
+
+# 5. Find your IP address
+ipconfig
+# Look for "IPv4 Address" (e.g., 192.168.1.15)
+```
+</details>
+
+<details>
+<summary><b>macOS / Linux</b></summary>
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/Maciasssss/Game-Off-Road-Hacking.git
 cd Game-Off-Road-Hacking
 
-# 2. Create a virtual environment (Recommended)
-python -m venv venv
-
-# Activate venv (Windows):
-venv\Scripts\activate
-# Activate venv (Mac/Linux):
+# 2. Create virtual environment
+python3 -m venv venv
 source venv/bin/activate
 
 # 3. Install dependencies
@@ -107,82 +208,242 @@ pip install flask flask-socketio eventlet
 # 4. Run the server
 python app.py
 
-# 5. Find your Local IP
-Windows: Open CMD, type ipconfig. Look for "IPv4 Address" (e.g., 192.168.1.15).
-Mac/Linux: Open Terminal, type ifconfig or ip a.
-Important: Your players and the ESP8266 nodes must connect to http://YOUR_IP_ADDRESS:5000.
+# 5. Find your IP address
+ifconfig  # or: ip a
+# Look for your network interface IP (e.g., 192.168.1.15)
 ```
-## 📡 Node Configuration (ESP8266)
-You need to upload code to the ESP8266s so they can talk to the server.
-1. Setup Arduino IDE
-  *  Download and install the Arduino IDE.
-2. Go to File > Preferences. In "Additional Boards Manager URLs", add:
-  *  http://arduino.esp8266.com/stable/package_esp8266com_index.json
-3. Go to Tools > Board > Boards Manager, search for esp8266, and install it.
-4. Go to Tools > Manage Libraries, search for and install:
-  *  MFRC522 (by GithubCommunity)
-  *  Adafruit SSD1306
-  *  Adafruit GFX Library
-  *  ArduinoJson
-  *  SocketIoClient (by Markus Sattler)
-2. Configure the Code
-Open the NodeCode.ino file (located in the /arduino folder of this repo).
-Edit the following lines at the top of the file:
+</details>
 
-const char* ssid     = "YOUR_WIFI_NAME";      // Your WiFi Name
-const char* password = "YOUR_WIFI_PASSWORD";  // Your WiFi Password
+### Accessing the Server
 
-// IP of the computer running app.py
-char host[] = "192.168.1.X"; 
-int port = 5000;
+Once running, players connect to: `http://YOUR_IP_ADDRESS:5000`
 
-// Set the ID for this specific node (Change this for each board!)
-// Options: "node_alpha", "node_beta", "node_gamma", "base_station"
-String nodeId = "node_alpha";
+> **Example:** If your IP is `192.168.1.15`, connect to `http://192.168.1.15:5000`
+
 ---
 
-3.Upload
-  1.Connect your ESP8266 via USB.
-  2.Select the correct COM port in Tools > Port.
-  3.Click Upload (Arrow icon).
-  4.Repeat for all 4 nodes, ensuring you change nodeId for each one.
+## 📡 Node Configuration (ESP8266)
 
-##🎮 How to Play
-1. The Goal
-Two teams (RED and BLUE) compete to control nodes. The first team to reach 1000 Points wins.
-2. Join the Game
-Connect your phone to the same WiFi as the server.
-Open your browser and go to http://YOUR_SERVER_IP:5000.
-Enter your Card Code (e.g., R1, B1) printed on your physical card.
-The Game Master (GM) (the first person to log in) must click START MATCH in the settings menu.
-3. The Gameplay Loop
-CHARGE: Your battery drains when you hack. Run to the Base Station node and scan your card to recharge.
-SCAN: Run to a Node (Alpha, Beta, or Gamma). Tap your card on the RFID reader.
-HACK: A minigame appears on your phone (Code breaking, wiring, math, etc.). Solve it fast!
-FAST (<3s): High Points + Long Shield.
-NORMAL (3-8s): Standard Points.
-SLOW (>8s): Low Points.
-4. Abilities (AP)
-Successful hacks earn Ability Points (AP). Open the Book Menu (📖) on your phone to spend AP:
-🔋 Instant Charge: Fill battery remotely.
-💥 EMP: Destroy enemy shields.
-❄️ Jammer: Freeze enemy screens.
-5. Game Master & Saving
-The GM can rename teams and adjust scoring rules via the Gear Menu (⚙️).
-If the GM clicks Restart Match, the current game data is saved to the Leaderboard history, and the match resets.
-If the GM disconnects, the next player to log in or refresh claims the GM role automatically.
+Program each ESP8266 to communicate with the game server.
 
+### 1. Arduino IDE Setup
 
-##🔧 Troubleshooting
-1. "Connection Refused" or Site won't load?
-Ensure the computer and phones/nodes are on the exact same WiFi.
-Check if your computer's Firewall is blocking Python. Allow access for python.exe on public/private networks.
-2. Node Screen says "WiFi Connecting..." forever?
-Check the SSID and Password in the Arduino code.
-Ensure the WiFi signal is strong enough at the node's location.
-3. Node says "Connected" but card scans don't do anything?
-Check the host[] IP address in the Arduino code. It must match your computer's current IP.
-Ensure the server (app.py) is actually running.
-Check the wiring of the RFID reader (SDA connected to D4, not D2).
-4. "Card ID Unknown"?
-You need to register the card UIDs in app.py. Look for the CARD_MAPPING dictionary and add your specific card UIDs there. You can see the UID in the Serial Monitor of the Arduino IDE when you tap a card.
+<details>
+<summary>Click to expand setup instructions</summary>
+
+1. Download and install [Arduino IDE](https://www.arduino.cc/en/software)
+2. Add ESP8266 board support:
+   - Go to **File → Preferences**
+   - Add to "Additional Boards Manager URLs":
+     ```
+     http://arduino.esp8266.com/stable/package_esp8266com_index.json
+     ```
+3. Install ESP8266 board:
+   - Go to **Tools → Board → Boards Manager**
+   - Search for `esp8266` and install
+4. Install required libraries:
+   - Go to **Tools → Manage Libraries**
+   - Install the following:
+     - `MFRC522` by GithubCommunity
+     - `Adafruit SSD1306`
+     - `Adafruit GFX Library`
+     - `ArduinoJson`
+     - `SocketIoClient` by Markus Sattler
+
+</details>
+
+### 2. Configure Node Code
+
+Open `NodeCode.ino` from the `/arduino` folder and modify:
+
+```cpp
+// WiFi credentials
+const char* ssid     = "YOUR_WIFI_NAME";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+// Server connection (use your computer's IP from Step 5 above)
+char host[] = "192.168.1.15";  // ← Change this!
+int port = 5000;
+
+// Node identifier (change for each board)
+String nodeId = "node_alpha";  // Options: node_alpha, node_beta, node_gamma, base_station
+```
+
+### 3. Upload to ESP8266
+
+| Node | nodeId Value | Purpose |
+|------|--------------|---------|
+| Node 1 | `"base_station"` | Battery recharge station |
+| Node 2 | `"node_alpha"` | Capture point |
+| Node 3 | `"node_beta"` | Capture point |
+| Node 4 | `"node_gamma"` | Capture point |
+
+**Upload Process:**
+1. Connect ESP8266 via USB
+2. Select **Tools → Port** (COM port on Windows, `/dev/tty*` on macOS/Linux)
+3. Select **Tools → Board → NodeMCU 1.0 (ESP-12E Module)**
+4. Click the **Upload** button (→)
+5. Wait for "Done uploading" message
+6. Repeat for all 4 nodes with different `nodeId` values
+
+---
+
+## 🎮 How to Play
+
+### Game Objective
+
+**Two teams (RED 🔴 and BLUE 🔵) compete to control nodes. First team to 1000 points wins!**
+
+### Setup Phase
+
+1. **Start the Server**
+   ```bash
+   python app.py
+   ```
+
+2. **Connect Players**
+   - Join the same WiFi network
+   - Navigate to `http://SERVER_IP:5000`
+   - Enter your card code (e.g., `R1`, `B2`)
+
+3. **Game Master Initialization**
+   - First player to log in becomes Game Master (GM)
+   - GM clicks **START MATCH** in settings (⚙️ icon)
+
+### Gameplay Loop
+
+```
+1. CHARGE  →  2. SCAN  →  3. HACK  →  4. EARN
+```
+
+#### 1. ⚡ CHARGE
+- Battery drains during hacks
+- Run to **Base Station** node
+- Scan your card to recharge
+
+#### 2. 📡 SCAN
+- Approach any capture point (Alpha, Beta, Gamma)
+- Tap your RFID card on the reader
+- Wait for confirmation beep/display
+
+#### 3. 🎯 HACK
+- Minigame appears on your phone instantly
+- Solve puzzles: code breaking, wiring, math, memory
+- Speed determines rewards:
+
+| Time | Points | Shield Duration |
+|------|--------|-----------------|
+| **< 3s** (Fast) | High | Long |
+| **3-8s** (Normal) | Standard | Medium |
+| **> 8s** (Slow) | Low | Short |
+
+#### 4. 💎 EARN
+- Successful hacks award points and Ability Points (AP)
+- Failed hacks = no rewards, battery still drains
+
+### Special Abilities
+
+Open the **Book Menu** (📖) to spend AP:
+
+| Ability | Cost | Effect |
+|---------|------|--------|
+| 🔋 **Instant Charge** | 3 AP | Fill battery remotely |
+| 💥 **EMP** | 5 AP | Destroy enemy shields |
+| ❄️ **Jammer** | 4 AP | Freeze enemy screens for 10s |
+
+### Game Master Controls
+
+The GM can access additional controls via the **Gear Menu** (⚙️):
+
+- Rename teams
+- Adjust scoring multipliers
+- Force-end match
+- **Restart Match** - Saves current game to leaderboard history and resets
+
+> **Note:** If GM disconnects, the next player to log in/refresh automatically becomes GM.
+
+---
+
+## 🔧 Troubleshooting
+
+### Connection Issues
+
+<details>
+<summary><b>"Connection Refused" or site won't load</b></summary>
+
+**Checklist:**
+- [ ] Server and devices on same WiFi network
+- [ ] Firewall allows `python.exe` on public/private networks
+  - Windows: Control Panel → Windows Defender Firewall → Allow an app
+- [ ] Server is running (`python app.py` showing no errors)
+- [ ] Correct IP address used (not 127.0.0.1 or localhost)
+
+</details>
+
+<details>
+<summary><b>Node screen shows "WiFi Connecting..." forever</b></summary>
+
+**Solutions:**
+1. Verify SSID and password in `NodeCode.ino` (case-sensitive!)
+2. Check WiFi signal strength at node location
+3. Ensure WiFi network uses 2.4GHz (ESP8266 doesn't support 5GHz)
+4. Try moving node closer to router
+5. Check Serial Monitor (Tools → Serial Monitor, 115200 baud) for error messages
+
+</details>
+
+### Hardware Issues
+
+<details>
+<summary><b>Node says "Connected" but card scans don't work</b></summary>
+
+**Troubleshooting:**
+1. Verify `host[]` IP matches server's current IP in `NodeCode.ino`
+2. Confirm server is running
+3. Check RFID wiring - SDA must be on **D4**, not D2
+4. Test RFID reader independently using example sketches
+5. Ensure card is held close (< 3cm) to reader
+
+</details>
+
+<details>
+<summary><b>"Card ID Unknown" error</b></summary>
+
+**Fix:**
+1. Open Serial Monitor while tapping cards to see UIDs
+2. Edit `app.py` and find `CARD_MAPPING` dictionary
+3. Add your card UIDs:
+   ```python
+   CARD_MAPPING = {
+       "1A2B3C4D": "R1",  # Red Team Player 1
+       "5E6F7G8H": "B1",  # Blue Team Player 1
+       # Add your UIDs here
+   }
+   ```
+4. Restart server
+
+</details>
+
+<details>
+<summary><b>OLED display not working</b></summary>
+
+**Common Causes:**
+- Wrong I2C address (try 0x3C or 0x3D in code)
+- Loose connections on SDA/SCL pins
+- Insufficient power - try external power supply
+- Faulty display - test with I2C scanner sketch
+
+</details>
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+<div align="center">
+
+⭐ Star this repo if you found it helpful!
+
+</div>
