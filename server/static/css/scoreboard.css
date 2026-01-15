@@ -1,0 +1,151 @@
+/* ==================== SCORE BOARD STYLES ==================== */
+
+.score-board {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 20px auto;
+    box-sizing: border-box;
+}
+
+/* --- INDIVIDUAL TEAM BOX --- */
+.score-box {
+    flex: 1 1 140px; 
+    
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    
+    padding: 10px;
+    background: rgba(0, 20, 0, 0.7);
+    border: 2px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+    
+    max-width: 450px; 
+}
+
+/* --- TEAM TITLE --- */
+.score-box-title {
+    font-size: clamp(14px, 4vw, 18px);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --- PROGRESS BAR CONTAINER --- */
+.score-box-bar {
+    background: #000;
+    border: 1px solid #555;
+    height: clamp(20px, 4vw, 30px); 
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+/* --- PROGRESS BAR FILL --- */
+.score-box-fill {
+    height: 100%;
+    width: 0%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 0 0 3px #000;
+    transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* --- NUMERIC SCORE VALUE --- */
+.score-box-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: clamp(20px, 5vw, 28px);
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* Bonus Indicator (e.g., +10) */
+.bonus-indicator {
+    font-size: 0.6em;
+    color: #ffff00 !important;
+    text-shadow: 0 0 5px rgba(255, 255, 0, 0.8);
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.3s ease-out;
+}
+
+/* ==================== TEAM SPECIFIC COLORS ==================== */
+
+/* RED TEAM */
+.score-box.red {
+    border-color: #ff3333;
+    box-shadow: inset 0 0 20px rgba(100, 0, 0, 0.2);
+}
+.score-box.red .score-box-title { color: #ff3333; }
+.score-box.red .score-box-bar { border-color: #ff3333; }
+.score-box.red .score-box-fill {
+    background: linear-gradient(90deg, #880000, #ff3333);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+.score-box.red .score-box-value { color: #ff3333; }
+
+/* BLUE TEAM */
+.score-box.blue {
+    border-color: #3366ff;
+    box-shadow: inset 0 0 20px rgba(0, 0, 100, 0.2);
+}
+.score-box.blue .score-box-title { color: #3366ff; }
+.score-box.blue .score-box-bar { border-color: #3366ff; }
+.score-box.blue .score-box-fill {
+    background: linear-gradient(90deg, #000088, #3366ff);
+    box-shadow: 0 0 10px rgba(0, 80, 255, 0.5);
+}
+.score-box.blue .score-box-value { color: #3366ff; }
+
+
+/* ==================== FEEDBACK / LOGS (BELOW SCORE) ==================== */
+
+.score-feedback {
+    min-height: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+/* Animation for new log entry */
+.score-feedback > div {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== MOBILE OPTIMIZATIONS ==================== */
+
+@media (max-width: 400px) {
+    .score-box {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .score-board {
+        gap: 8px;
+    }
+}

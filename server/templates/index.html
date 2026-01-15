@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cyber-War Terminal</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Core Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ui-menu-animations.css') }}">
+    
+    <!-- UI Components -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/topbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/scoreboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nodes.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/console.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/abilities.css') }}">
+    
+    <!-- Game & FX -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/games.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/visual_fx_matrix.css') }}">
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/visual_fx_abilites.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorial.css') }}">
+
+    <!-- Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+</head>
+<body>
+
+    <!-- BACKGROUND -->
+    <canvas id="matrix-bg"></canvas>
+
+    <!-- 1. LOGIN SCREEN -->
+    <div id="screen-login" class="screen active">
+        <div class="login-container">
+            <h1 class="glitch-title" data-text="CYBER-WAR">CYBER-WAR</h1>
+            <h2 class="subtitle">PROTOCOL SYNCHRONIZATION</h2>
+            
+            <div class="input-group">
+                <input type="text" id="input-card-code" placeholder="CARD ID (e.g. R1)" maxlength="4" autocomplete="off">
+                <button id="btn-login">JOIN NETWORK</button>
+            </div>
+            <p id="login-msg" class="status"></p>
+        </div>
+    </div>
+
+    <!-- 2. DASHBOARD SCREEN -->
+    <div id="screen-dashboard" class="screen">
+        <div class="top-bar">
+            <span id="display-player-id">PLAYER: ---</span>
+            <div id="game-timer" class="game-timer">00:00</div>
+            <div id="battery-status" class="battery-status-container">
+                <span class="battery-icon">🔋</span>
+                <span class="battery-text">BATTERY:</span>
+                <div class="battery-bar">
+                    <div id="battery-fill" class="battery-fill" style="width: 100%;"></div>
+                </div>
+                <span id="battery-percent" class="battery-percent">100%</span>
+            </div>
+        </div>
+        
+        <div class="score-board">
+            <!-- RED TEAM -->
+            <div class="score-box red">
+                <div class="score-box-title">RED TEAM</div>
+                <div class="score-box-bar">
+                    <div class="score-box-fill" style="width: 0%;"></div>
+                </div>
+                <div class="score-box-value">
+                    <span id="score-red">0</span>
+                </div>
+                <div class="score-feedback"></div>
+            </div>
+
+            <!-- BLUE TEAM -->
+            <div class="score-box blue">
+                <div class="score-box-title">BLUE TEAM</div>
+                <div class="score-box-bar">
+                    <div class="score-box-fill" style="width: 0%;"></div>
+                </div>
+                <div class="score-box-value">
+                    <span id="score-blue">0</span>
+                </div>
+                <div class="score-feedback"></div>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <h3>NODE NETWORK</h3>
+            <div class="nodes-grid">
+                <div class="node neutral" id="node-alpha" data-node-id="node_alpha">
+                    <div class="node-name">ALPHA</div>
+                    <div class="node-status">NEUTRAL</div>
+                </div>
+                <div class="node neutral" id="node-beta" data-node-id="node_beta">
+                    <div class="node-name">BETA</div>
+                    <div class="node-status">NEUTRAL</div>
+                </div>
+                <div class="node neutral" id="node-gamma" data-node-id="node_gamma">
+                    <div class="node-name">GAMMA</div>
+                    <div class="node-status">NEUTRAL</div>
+                </div>
+            </div>
+        </div>
+        
+        <button id="btn-ability-menu" class="ability-menu-btn" title="Tactical Abilities">📖</button>
+        <button id="btn-gm-menu" class="gm-menu-btn" title="Game Master Menu">⚙️</button>
+        
+        <div id="console-log" class="console" style="display: none;">System ready.</div>
+    </div>
+
+    <!-- UI PANELS (Abilities, GM, Modal) -->
+    <div id="ability-menu" class="ability-menu">
+        <div class="ability-menu-header">
+            <h2>TACTICAL PROTOCOLS</h2>
+            <button id="btn-close-ability-menu" class="close-btn">✕</button>
+        </div>
+        <div class="ability-menu-content">
+            <div class="ap-status-section">
+                <h3>ABILITY POINTS</h3>
+                <div class="ap-bar-container">
+                    <div id="ap-fill" class="ap-fill" style="width: 0%;"></div>
+                    <span id="ap-text">0/300</span>
+                </div>
+            </div>
+            <div class="abilities-list"></div>
+        </div>
+    </div>  
+
+    <div id="gm-menu" class="gm-menu">
+        <div class="gm-menu-header">
+            <h2>GAME MASTER PANEL</h2>
+            <button id="btn-close-gm-menu" class="close-btn">✕</button>
+        </div>
+        
+        <div class="gm-menu-content">
+            <!-- TEAM NAMING SECTION -->
+            <div class="gm-menu-section" id="gm-section-teams">
+                <h3>TEAM NAMES</h3>
+                <div class="team-name-group">
+                    <label>RED TEAM NAME:</label>
+                    <input type="text" id="input-red-team-name" placeholder="Enter RED team name" maxlength="20">
+                    <button id="btn-set-red-team" class="gm-btn">SET RED TEAM</button>
+                </div>
+                <div class="team-name-group">
+                    <label>BLUE TEAM NAME:</label>
+                    <input type="text" id="input-blue-team-name" placeholder="Enter BLUE team name" maxlength="20">
+                    <button id="btn-set-blue-team" class="gm-btn">SET BLUE TEAM</button>
+                </div>
+            </div>
+
+            <!-- GAME CONFIGURATION SECTION -->
+            <div class="gm-menu-section" id="gm-config-section">
+                <h3>GAME CONFIGURATION <span id="config-lock-icon">🔒</span></h3>
+                
+                <div class="input-group-row">
+                    <label>MAX SCORE:</label>
+                    <input type="number" id="conf-max-score" value="1000" step="100">
+                </div>
+
+                <div class="input-group-row">
+                    <label>MAX AP:</label>
+                    <input type="number" id="conf-max-ap" value="400" step="50">
+                </div>
+
+                <div class="input-group-row">
+                    <label>COST MULT (x):</label>
+                    <input type="range" id="conf-cost-mult" min="0.5" max="2.0" step="0.1" value="1.0" style="flex:1;">
+                    <span id="conf-cost-val" style="color: #00ff00; width: 40px; text-align:right;">1.0</span>
+                </div>
+
+                <!-- ADDED: Shield & Bonus inputs required by your JS -->
+                <div style="display:flex; gap:10px;">
+                    <div class="input-group-row" style="flex:1; flex-direction:column; align-items:stretch;">
+                        <label>SHIELD (FAST)</label>
+                        <input type="number" id="conf-shield-fast" value="45">
+                    </div>
+                    <div class="input-group-row" style="flex:1; flex-direction:column; align-items:stretch;">
+                        <label>SHIELD (NORM)</label>
+                        <input type="number" id="conf-shield-normal" value="15">
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <div class="input-group-row" style="flex:1; flex-direction:column; align-items:stretch;">
+                        <label>BONUS (FAST)</label>
+                        <input type="number" id="conf-bonus-fast" value="10">
+                    </div>
+                    <div class="input-group-row" style="flex:1; flex-direction:column; align-items:stretch;">
+                        <label>BONUS (NORM)</label>
+                        <input type="number" id="conf-bonus-normal" value="5">
+                    </div>
+                </div>
+
+                <div class="input-group-row">
+                    <label>BATTERY DRAIN:</label>
+                    <input type="checkbox" id="conf-battery-drain" checked style="width: 20px; height: 20px;">
+                </div>
+                
+                <div class="gm-menu-section-subset" style="margin-top: 15px; border-top: 1px dashed #333; padding-top: 10px;">
+                    <h3 style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">ACTIVE PROTOCOLS (Uncheck to Ban)</h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <input type="checkbox" class="ability-toggle" data-ability="instant_charge" id="toggle-charge" checked style="width:auto; margin:0;">
+                            <label for="toggle-charge" style="font-size:0.9em; color:#00ff00;">INSTANT CHARGE</label>
+                        </div>
+
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <input type="checkbox" class="ability-toggle" data-ability="shield_break" id="toggle-emp" checked style="width:auto; margin:0;">
+                            <label for="toggle-emp" style="font-size:0.9em; color:#ffcc00;">EMP BLAST</label>
+                        </div>
+
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <input type="checkbox" class="ability-toggle" data-ability="global_shield" id="toggle-shield" checked style="width:auto; margin:0;">
+                            <label for="toggle-shield" style="font-size:0.9em; color:#00ccff;">GLOBAL SHIELD</label>
+                        </div>
+
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <input type="checkbox" class="ability-toggle" data-ability="boost" id="toggle-boost" checked style="width:auto; margin:0;">
+                            <label for="toggle-boost" style="font-size:0.9em; color:#ff6600;">OVERCLOCK</label>
+                        </div>
+
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <input type="checkbox" class="ability-toggle" data-ability="freeze" id="toggle-freeze" checked style="width:auto; margin:0;">
+                            <label for="toggle-freeze" style="font-size:0.9em; color:#00ffff;">JAMMER</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-save-config" class="gm-btn">SAVE CONFIGURATION</button>
+                <div id="config-status-msg" style="font-size: 0.8em; color: #666; margin-top: 5px;"></div>
+            </div>
+            
+            <!-- PLAYER MANAGEMENT SECTION -->
+            <div class="gm-menu-section" id="gm-section-player">
+                <h3>PLAYER MANAGEMENT</h3>
+                <button id="btn-change-name" class="gm-btn">CHANGE MY NAME</button>
+            </div>
+            
+            <!-- ADDED: LEADERBOARD SECTION (Was missing) -->
+            <div class="gm-menu-section" id="gm-section-leaderboard">
+                <h3>LEADERBOARD</h3>
+                <button id="btn-view-leaderboard" class="gm-btn">VIEW LEADERBOARD</button>
+            </div>
+            
+            <!-- GAME CONTROL SECTION -->
+            <div class="gm-menu-section" id="gm-section-control">
+                <h3>GAME CONTROL</h3>
+                <button id="btn-start-game-menu" class="gm-btn start-btn">START MATCH</button>
+                <button id="btn-restart-game-menu" class="gm-btn restart-btn" style="display:none;">RESTART GAME</button>
+                <button id="btn-end-game-menu" class="gm-btn end-btn">END GAME NOW</button>
+            </div>
+
+            <div class="gm-menu-section" id="gm-section-system">
+                <h3>SYSTEM</h3>
+                <button id="btn-menu-logout" class="gm-btn logout-btn">DISCONNECT</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="leaderboard-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>LEADERBOARD</h2>
+                <button id="btn-close-leaderboard" class="close-btn">✕</button>
+            </div>
+            <div id="leaderboard-table-container" class="leaderboard-container"></div>
+        </div>
+    </div>
+
+    <!-- 3. GAME SCREEN -->
+    <div id="screen-game" class="screen overlay">
+        <div class="game-header">
+            <h2>HACKING IN PROGRESS</h2>
+            <div class="timer-bar"><div id="game-timer-fill"></div></div>
+        </div>
+        <div id="game-container"></div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="{{ url_for('static', filename='js/modules/MatrixEffect.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/NotificationManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/VisualFXManagerAbilities.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/AbilityManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/SocketClient.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/UIManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/AuthManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/GMManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/GameEngine.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/EnergyBarManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/ScoreboardManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/ShieldManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/TutorialManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/GameTimeManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>

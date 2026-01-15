@@ -1,0 +1,243 @@
+/* ==================== NODES & MAP STYLES ==================== */
+
+.map-container {
+    width: 100%; 
+    max-width: 900px; 
+    margin: 0 auto;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #00ff00;
+    border-radius: 8px;
+    padding: clamp(15px, 3vw, 25px);
+    box-shadow: 0 0 25px rgba(0, 255, 0, 0.2);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.map-container h3 {
+    font-size: clamp(18px, 4vw, 24px);
+    color: #00ff00;
+    margin: 0 0 20px 0;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+    text-align: center;
+    width: 100%;
+}
+
+/* --- RESPONSIVE NODE GRID --- */
+.nodes-grid {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 20px; 
+    width: 100%;
+}
+
+/* --- INDIVIDUAL NODE STYLING --- */
+.node {
+    flex: 1 1 130px; 
+    max-width: 180px; 
+    
+    aspect-ratio: 1 / 1; 
+    
+    border: 3px solid #555;
+    border-radius: 16px;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    background: rgba(30, 30, 30, 0.9);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Text Styling inside Node */
+.node-name {
+    font-size: clamp(16px, 4vw, 22px);
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    z-index: 2;
+    position: relative;
+    text-align: center;
+    line-height: 1;
+}
+
+.node-status {
+    font-size: clamp(10px, 2.5vw, 12px);
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+    z-index: 2;
+    position: relative;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 0 5px;
+    line-height: 1.2;
+}
+
+/* Hover Effects (Desktop) */
+@media (hover: hover) {
+    .node:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    }
+}
+
+/* Active Click Effect */
+.node:active {
+    transform: scale(0.95);
+}
+
+/* ==================== NODE STATES ==================== */
+
+/* --- NEUTRAL --- */
+.node.neutral {
+    border-color: #666;
+    color: #aaa;
+    box-shadow: inset 0 0 20px rgba(100, 100, 100, 0.2);
+    animation: pulse-neutral 3s ease-in-out infinite;
+}
+
+/* --- RED TEAM --- */
+.node.red {
+    background: rgba(80, 0, 0, 0.8);
+    color: #ff5555;
+    border-color: #ff3333;
+    box-shadow: inset 0 0 30px rgba(255, 0, 0, 0.3), 0 0 15px rgba(255, 0, 0, 0.4);
+    animation: pulse-red 2s infinite;
+}
+
+/* --- BLUE TEAM --- */
+.node.blue {
+    background: rgba(0, 0, 80, 0.8);
+    color: #5588ff;
+    border-color: #3366ff;
+    box-shadow: inset 0 0 30px rgba(0, 0, 255, 0.3), 0 0 15px rgba(0, 0, 255, 0.4);
+    animation: pulse-blue 2s infinite;
+}
+
+/* ==================== SHIELD STYLES ==================== */
+
+.node.shield {
+    border-color: #00ffff !important;
+    animation: shield-pulse 1.5s infinite alternate !important;
+}
+
+/* The glass overlay effect */
+.node.shield::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle, rgba(0,255,255,0.1) 0%, rgba(0,255,255,0.3) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* The small dot indicator */
+.node-shield-indicator {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 10px;
+    height: 10px;
+    background: #00ffff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00ffff;
+    z-index: 3;
+    animation: blink 1s infinite;
+}
+
+/* The Timer Text (e.g. "🛡️ 45s") */
+.shield-timer {
+    font-size: 12px;
+    color: #00ffff;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-top: 5px;
+    z-index: 3;
+    font-weight: bold;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.shield-timer.shield-expiring {
+    color: #ff0000; /* Red text */
+    border-color: #ff0000;
+    animation: blink-fast 0.5s infinite;
+}
+
+/* ==================== ANIMATIONS ==================== */
+
+@keyframes pulse-neutral {
+    0%, 100% { box-shadow: inset 0 0 10px rgba(100,100,100,0.1); }
+    50% { box-shadow: inset 0 0 25px rgba(100,100,100,0.3); }
+}
+
+@keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.2); }
+    50% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.6); }
+}
+
+@keyframes pulse-blue {
+    0%, 100% { box-shadow: 0 0 10px rgba(0, 0, 255, 0.2); }
+    50% { box-shadow: 0 0 25px rgba(0, 0, 255, 0.6); }
+}
+
+@keyframes shield-pulse {
+    from { box-shadow: 0 0 5px #00ffff, inset 0 0 5px #00ffff; }
+    to { box-shadow: 0 0 15px #00ffff, inset 0 0 15px #00ffff; }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+@keyframes blink-fast {
+    0%, 100% { opacity: 1; background: rgba(255, 0, 0, 0.2); }
+    50% { opacity: 0.5; background: rgba(0, 0, 0, 0.7); }
+}
+
+/* ==================== MOBILE MEDIA QUERIES ==================== */
+
+/* Small Phones */
+@media (max-width: 400px) {
+    .map-container {
+        padding: 15px 10px;
+    }
+    
+    .nodes-grid {
+        gap: 12px;
+    }
+    
+    .node {
+        flex: 1 1 100px; 
+        max-width: 110px; 
+        border-width: 2px;
+    }
+    
+    .node-name { font-size: 16px; }
+    .node-status { font-size: 9px; }
+}
+
+/* Landscape Mobile (Short screens) */
+@media (max-height: 500px) and (orientation: landscape) {
+    .nodes-grid {
+        flex-wrap: nowrap; 
+    }
+    .node {
+        max-width: 120px;
+        aspect-ratio: auto;
+        height: 100px;
+    }
+}

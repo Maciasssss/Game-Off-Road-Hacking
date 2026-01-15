@@ -1,0 +1,83 @@
+/* ==================== NOTIFICATION CONTAINER ==================== */
+#notification-container {
+    position: fixed;
+    top: 80px; 
+    right: 20px;
+    width: 350px;
+    max-width: 90vw; 
+    z-index: 20000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none; 
+}
+
+@media (max-width: 600px) {
+    #notification-container {
+        top: 60px;
+        right: 50%;
+        transform: translateX(50%);
+        width: 95%;
+    }
+}
+
+/* ==================== NOTIFICATION CARD ==================== */
+.notification {
+    background: rgba(13, 13, 13, 0.95);
+    backdrop-filter: blur(5px);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    pointer-events: auto; 
+    
+    /* INITIAL HIDDEN STATE */
+    opacity: 0;
+    transform: translateX(50px);
+    
+    /* ANIMATION */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ==================== VARIANTS ==================== */
+
+/* Success */
+.notification-success { border-color: var(--color-primary); }
+.notification-success .notif-title { color: var(--color-primary); }
+
+/* Warning */
+.notification-warning { border-color: #ffcc00; }
+.notification-warning .notif-title { color: #ffcc00; }
+
+/* Error */
+.notification-error { border-color: var(--color-red); }
+.notification-error .notif-title { color: var(--color-red); }
+
+/* System */
+.notification-system, .notification-info { border-color: var(--color-secondary); }
+.notification-system .notif-title { color: var(--color-secondary); }
+
+/* Critical */
+.notification-critical {
+    border-color: #ff0000;
+    background: rgba(50, 0, 0, 0.95);
+    animation: criticalPulse 1s infinite alternate;
+}
+.notification-critical .notif-title { color: #ff0000; }
+
+@keyframes criticalPulse {
+    from { box-shadow: 0 0 10px #ff0000; }
+    to { box-shadow: 0 0 25px #ff0000; }
+}
+
+/* Ability */
+.notification-ability {
+    border-color: #00ffff;
+    background: linear-gradient(90deg, rgba(0,0,0,0.95) 0%, rgba(0,50,50,0.95) 100%);
+}
+.notification-ability .notif-title { color: #00ffff; }
+
+/* Confirm */
+.notification-confirm { border-color: #ff9900; }
+.notification-confirm .notif-title { color: #ff9900; }

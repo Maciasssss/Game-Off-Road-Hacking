@@ -1,0 +1,281 @@
+/* ==================== MENU STYLES & CLOSE BUTTONS ==================== */
+
+/* 1. Close Button */
+.close-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #ff3333; 
+    color: #ff3333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 5px #ff3333, inset 0 0 5px rgba(255, 51, 51, 0.3);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    background: #ff3333;
+    color: #000;
+    box-shadow: 0 0 20px #ff3333;
+    transform: rotate(90deg) scale(1.1);
+}
+
+.close-btn:active {
+    transform: rotate(90deg) scale(0.9);
+}
+
+/* ==================== GM MENU (RIGHT) ==================== */
+.gm-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    max-width: 400px;
+    height: 100vh;
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+    border-left: 2px solid var(--color-primary);
+    z-index: 3000;
+    overflow-y: auto;
+    transition: right 0.4s ease-in-out;
+    padding: var(--spacing-md);
+    box-shadow: -10px 0 50px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+}
+
+.gm-menu.open {
+    right: 0;
+}
+
+/* ==================== ABILITY MENU (LEFT) ==================== */
+.ability-menu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    max-width: 350px;
+    height: 100vh;
+    background: linear-gradient(135deg, #0d0d0d 0%, #001a1a 100%);
+    border-right: 2px solid var(--color-secondary);
+    z-index: 3000;
+    overflow-y: auto;
+    transition: left 0.4s ease-in-out;
+    padding: var(--spacing-md);
+    box-shadow: 10px 0 50px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+}
+
+.ability-menu.open {
+    left: 0;
+}
+
+/* ==================== HEADERS ==================== */
+.gm-menu-header, .ability-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #333;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+    background: rgba(0,0,0,0.3); 
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.gm-menu-header h2 { color: var(--color-primary); margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; }
+.ability-menu-header h2 { color: var(--color-secondary); margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; }
+
+
+/* ==================== MENU TRIGGER BUTTONS ==================== */
+.gm-menu-btn, .ability-menu-btn {
+    position: fixed;
+    top: 15px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    z-index: 1000;
+    cursor: pointer;
+    transition: all 0.2s;
+    backdrop-filter: blur(4px);
+}
+
+.gm-menu-btn {
+    right: 15px;
+    border: 2px solid var(--color-primary);
+    color: var(--color-primary);
+}
+
+.ability-menu-btn {
+    left: 15px;
+    border: 2px solid var(--color-secondary);
+    color: var(--color-secondary);
+}
+
+.gm-menu-btn:hover, .ability-menu-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px currentColor;
+}
+
+/* ==================== SECTIONS & CONTENT ==================== */
+.gm-menu-section, .ability-menu-content {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin-bottom: 15px;
+    border: 1px solid #333;
+}
+
+.gm-menu-section h3, .ap-status-section h3 {
+    margin-top: 0;
+    font-size: 0.9rem;
+    color: #888;
+    border-bottom: 1px solid #444;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Form Styles */
+.input-group-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.input-group-row label {
+    font-size: 0.85rem;
+    flex: 1;
+    text-align: left;
+    color: #ccc;
+}
+
+.input-group-row input[type="text"], 
+.input-group-row input[type="number"] {
+    flex: 1;
+    margin: 0;
+    padding: 8px;
+    font-size: 0.9rem;
+    background: #111;
+    border: 1px solid #444;
+    color: #fff;
+    text-align: right;
+}
+
+.input-group-row input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 5px var(--color-primary-dim);
+}
+
+/* Team Names */
+.team-name-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.team-name-group input {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+/* Action Buttons */
+.gm-btn {
+    width: 100%;
+    margin-top: 5px;
+    padding: 12px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.start-btn { background: rgba(0, 255, 0, 0.15); border-color: #00ff00; color: #00ff00; }
+.start-btn:hover { background: #00ff00; color: #000; }
+
+.restart-btn { background: rgba(255, 165, 0, 0.15); border-color: orange; color: orange; }
+.restart-btn:hover { background: orange; color: #000; }
+
+.end-btn { background: rgba(255, 0, 0, 0.15); border-color: red; color: red; }
+.end-btn:hover { background: red; color: #000; }
+
+.logout-btn { background: transparent; border: 1px solid #666; color: #aaa; }
+.logout-btn:hover { border-color: #fff; color: #fff; }
+
+/* Status Messages */
+#config-status-msg {
+    font-size: 0.8rem;
+    margin-top: 10px;
+    text-align: center;
+    min-height: 1.2em;
+}
+
+/* Ability Specifics */
+.ap-bar-container {
+    width: 100%;
+    height: 20px;
+    background: #000;
+    border: 1px solid var(--color-secondary);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.ap-fill {
+    height: 100%;
+    background: var(--color-secondary);
+    width: 0%;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px var(--color-secondary);
+}
+
+#ap-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 0;
+    line-height: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-shadow: 0 0 2px #000;
+    color: #fff;
+}
+
+@media (max-width:600px) {
+    .gm-menu-btn {
+        top: 1px;
+        margin-top: 5px;
+        bottom: 20px;
+        right: 30px;
+        width: 55px;
+        height: 55px;
+        font-size: 24px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        background: rgba(0, 10, 20, 0.9);
+
+    }
+}
+
+
+@media (max-width:375px) {
+    .gm-menu-btn {
+        top: 30px;
+    }
+}

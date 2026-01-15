@@ -1,0 +1,280 @@
+/* ==================== ABILITY MENU STYLES ==================== */
+
+/* --- MENU BUTTON (The Trigger) --- */
+.ability-menu-btn {
+    position: fixed;
+    top: clamp(10px, 3vw, 20px); 
+    left: clamp(10px, 3vw, 20px);
+    width: clamp(50px, 12vw, 65px);
+    height: clamp(50px, 12vw, 65px);
+    border-radius: 50%;
+    
+    display: flex;
+    align-items: center;     
+    justify-content: center;  
+    padding: 0;               
+    line-height: 1;           
+    text-align: center;
+
+    background: rgba(0, 20, 40, 0.8);
+    border: 2px solid #0096ff;
+    color: #0096ff;
+    font-size: clamp(24px, 6vw, 32px);
+    cursor: pointer;
+    z-index: 1400;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0, 150, 255, 0.4);
+    backdrop-filter: blur(5px);
+}
+
+.ability-menu-btn:hover {
+    background: rgba(0, 150, 255, 0.2);
+    box-shadow: 0 0 25px #0096ff;
+    transform: scale(1.05);
+    color: #fff;
+}
+
+/* Pulsing effect when AP is full */
+.ability-menu-btn.ready {
+    animation: book-pulse 2s infinite;
+    background: rgba(0, 150, 255, 0.4);
+    border-color: #00ffff;
+    color: #00ffff;
+}
+
+@keyframes book-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.6); }
+    70% { box-shadow: 0 0 0 15px rgba(0, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0); }
+}
+
+/* --- SIDE MENU PANEL --- */
+.ability-menu {
+    position: fixed;
+    top: 0;
+    left: -110%; 
+    width: 100%;
+    max-width: 450px;
+    height: 100vh;
+    height: 100dvh; 
+    background: linear-gradient(135deg, #050a14 0%, #0a1428 100%);
+    border-right: 2px solid #0096ff;
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    transition: left 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 10px 0 50px rgba(0, 0, 0, 0.8);
+}
+
+.ability-menu.open {
+    left: 0;
+}
+
+/* Header */
+.ability-menu-header {
+    background: rgba(0, 20, 40, 0.95);
+    border-bottom: 2px solid #0096ff;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0; 
+}
+
+.ability-menu-header h2 {
+    margin: 0;
+    color: #0096ff;
+    font-size: clamp(18px, 5vw, 24px);
+    text-shadow: 0 0 10px rgba(0, 150, 255, 0.5);
+    letter-spacing: 2px;
+}
+
+/* Content Area (Scrollable) */
+.ability-menu-content {
+    flex: 1; 
+    overflow-y: auto; 
+    overflow-x: hidden;
+    padding: 20px;
+    padding-bottom: 80px; 
+    -webkit-overflow-scrolling: touch; 
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* --- AP BAR --- */
+.ap-status-section {
+    flex-shrink: 0;
+    margin-bottom: 10px;
+}
+
+.ap-status-section h3 {
+    color: #88ccff;
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.ap-bar-container {
+    width: 100%;
+    height: 30px; 
+    background: #000;
+    border: 1px solid #0096ff;
+    border-radius: 4px; 
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 15px rgba(0, 150, 255, 0.2);
+}
+
+.ap-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #0044ff, #0096ff, #00ffff);
+    width: 0%;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+}
+
+#ap-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 4px #000, 0 0 8px #000;
+    z-index: 2;
+    white-space: nowrap;
+}
+
+/* --- ABILITY CARDS LIST --- */
+.dynamic-ability-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Card Styling */
+.ability-card {
+    position: relative;
+    background: rgba(0, 20, 40, 0.6);
+    border: 1px solid #334455;
+    border-radius: 6px;
+    padding: 12px 15px;
+    display: grid;
+    /* Grid layout: Icon | Content */
+    grid-template-columns: auto 1fr; 
+    gap: 15px;
+    align-items: center;
+    cursor: not-allowed;
+    opacity: 0.5;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: left;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.ability-icon {
+    font-size: clamp(24px, 8vw, 32px);
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.3);
+    border-radius: 50%;
+    filter: grayscale(100%);
+    transition: filter 0.3s;
+}
+
+.ability-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}
+
+.ability-name {
+    color: #aaa;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: bold;
+    font-size: clamp(16px, 4vw, 18px); 
+    letter-spacing: 1px;
+    line-height: 1.2;
+}
+
+.ability-cost {
+    color: #666;
+    font-size: clamp(12px, 3.5vw, 14px);
+    font-weight: bold;
+}
+
+/* --- READY STATE --- */
+.ability-card.ready {
+    background: rgba(0, 40, 70, 0.85);
+    border-color: #0096ff; 
+    opacity: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.ability-card.ready:hover {
+    background: rgba(0, 60, 100, 0.95);
+    transform: translateY(-2px);
+}
+
+.ability-card.ready:active {
+    transform: scale(0.98);
+}
+
+.ability-card.ready .ability-icon {
+    filter: grayscale(0%);
+    text-shadow: 0 0 10px currentColor;
+}
+
+.ability-card.ready .ability-name {
+    color: #fff;
+    text-shadow: 0 0 5px rgba(0, 150, 255, 0.5);
+}
+
+/* ==================== MOBILE ==================== */
+@media (max-width: 600px) {
+    .ability-menu-btn {
+        top: 1px;
+        margin-top: 5px;
+        bottom: 20px;     
+        left: 20px;      
+        width: 55px;
+        height: 55px;
+        font-size: 24px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.8); 
+        background: rgba(0, 10, 20, 0.9); 
+    }
+}
+@media (max-width: 375px) {
+    .ability-menu-btn {
+        top: 30px;        
+    }
+}
+
+@media (max-width: 480px) {
+    .ability-menu {
+        max-width: 100%; 
+        border-right: none;
+    }
+
+    .ability-menu-content {
+        padding: 15px;
+    }
+
+    .ability-card {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .ability-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 24px;
+    }
+}

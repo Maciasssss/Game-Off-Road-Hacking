@@ -1,0 +1,177 @@
+/* --- BUTTON ON LOGIN SCREEN --- */
+.tutorial-trigger-btn {
+    margin-top: 20px;
+    background: rgba(0, 20, 0, 0.8);
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    padding: 12px;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.1em;
+    width: 100%;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tutorial-trigger-btn:hover {
+    background: #00ff00;
+    color: #000;
+    box-shadow: 0 0 15px #00ff00;
+}
+
+/* --- FULL SCREEN OVERLAY --- */
+#screen-tutorial {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(5, 5, 10, 0.95);
+    z-index: 9999;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+#screen-tutorial.active {
+    display: flex;
+}
+
+/* --- MAIN CONTAINER --- */
+.tutorial-box {
+    width: 90%;
+    max-width: 800px;
+    height: 85vh;
+    background: #0d0d0d;
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+/* --- HEADER --- */
+.tutorial-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(0, 255, 0, 0.1);
+    border-bottom: 2px solid #00ff00;
+}
+
+.tutorial-header h2 {
+    margin: 0;
+    color: #00ff00;
+    font-size: 1.5em;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.close-tut-btn {
+    background: transparent;
+    border: 1px solid #ff3333;
+    color: #ff3333;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-tut-btn:hover { background: #ff3333; color: #000; }
+
+/* --- TABS NAVIGATION --- */
+.tut-tabs {
+    display: flex;
+    border-bottom: 1px solid #333;
+    background: #111;
+}
+
+.tut-tab-btn {
+    flex: 1;
+    padding: 15px;
+    background: transparent;
+    border: none;
+    color: #666;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1em;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.tut-tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+
+.tut-tab-btn.active {
+    color: #00ff00;
+    border-bottom: 3px solid #00ff00;
+    background: rgba(0, 255, 0, 0.05);
+    font-weight: bold;
+}
+
+/* --- SCROLLABLE CONTENT AREA --- */
+.tut-content-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    color: #ccc;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* --- SECTIONS --- */
+.tut-section { display: none; animation: fadeIn 0.3s ease; }
+.tut-section.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+.tut-block { margin-bottom: 30px; border-bottom: 1px dashed #333; padding-bottom: 20px; }
+.tut-block:last-child { border: none; }
+
+.tut-title {
+    color: #fff;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-badge { color: #00ff00; font-size: 1.2em; }
+
+/* --- Q&A STYLING --- */
+.qa-item {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 3px solid #0088ff;
+    border-radius: 0 4px 4px 0;
+}
+
+.question { color: #0088ff; font-weight: bold; margin-bottom: 5px; font-size: 1.1em; }
+.answer { color: #ccc; font-size: 0.95em; }
+
+.highlight { color: #ffff00; font-weight: bold; }
+.cmd-text { background: #222; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #fff; border: 1px solid #444; }
+
+/* --- ABILITY TABLE --- */
+.ability-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+}
+.ab-card {
+    background: #050a10;
+    border: 1px solid #333;
+    padding: 10px;
+    border-radius: 4px;
+}
+.ab-header { display: flex; justify-content: space-between; margin-bottom: 5px; color: #fff; font-weight: bold;}
+.ab-cost { color: #00ff00; font-size: 0.8em; }
+.ab-desc { font-size: 0.85em; color: #888; }

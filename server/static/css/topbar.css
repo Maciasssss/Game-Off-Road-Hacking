@@ -1,0 +1,149 @@
+/* ==================== TOP BAR STYLES ==================== */
+/* Player ID, game timer, and battery status */
+
+.top-bar {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 20px auto;
+    padding: 10px 15px;
+    
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid #00ff00;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+    
+    box-sizing: border-box;
+}
+
+/* --- PLAYER ID --- */
+#display-player-id {
+    flex: 1 1 auto; 
+    color: #00ff00;
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.6);
+    font-weight: bold;
+    font-size: clamp(14px, 4vw, 18px);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* --- GAME TIMER --- */
+.game-timer {
+    flex: 0 0 auto;
+    color: #00ff00;
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.6);
+    font-weight: bold;
+    font-size: clamp(16px, 5vw, 20px);
+    font-family: 'Share Tech Mono', monospace;
+    
+    padding: 5px 15px;
+    background: rgba(0, 20, 0, 0.6);
+    border: 1px solid #00ff00;
+    border-radius: 4px;
+    min-width: 60px;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+/* --- BATTERY STATUS CONTAINER --- */
+.battery-status-container {
+    flex: 0 0 auto; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    padding: 6px 12px;
+    background: rgba(0, 20, 0, 0.6);
+    border: 1px solid #00ff00;
+    border-radius: 4px;
+}
+
+/* Battery Text & Icon */
+.battery-icon { font-size: 14px; }
+.battery-text { 
+    color: #00ff00; 
+    font-size: 12px; 
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* The actual bar container */
+.battery-bar {
+    width: 80px; 
+    height: 10px;
+    background: #000;
+    border: 1px solid #00ff00;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* The colorful fill inside the bar */
+.battery-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #00ff00, #00aa00);
+    transition: width 0.3s ease, background 0.3s ease;
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.6);
+}
+
+.battery-percent {
+    color: #00ff00;
+    font-size: 12px;
+    min-width: 35px;
+    text-align: right;
+}
+
+/* --- STATES (Low/Critical) --- */
+.battery-fill.low { background: linear-gradient(90deg, #ffaa00, #ff6600); }
+.battery-fill.critical { background: linear-gradient(90deg, #ff3333, #cc0000); animation: battery-critical-pulse 0.8s infinite; }
+.battery-percent.critical { color: #ff3333; }
+@keyframes battery-critical-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+
+/* ==================== MOBILE MEDIA QUERIES ==================== */
+
+@media (max-width: 600px) {
+    .top-bar {
+        padding: 8px;
+        gap: 5px;
+        justify-content: center; 
+    }
+
+    /* 1. Player Name takes full top row */
+    #display-player-id {
+        flex: 1 1 100%;
+        text-align: center;
+        font-size: 16px;
+        margin-bottom: 5px;
+        order: 1; 
+    }
+
+    /* 2. Timer takes middle */
+    .game-timer {
+        order: 2;
+        font-size: 14px;
+        padding: 2px 10px;
+        min-width: auto;
+    }
+
+    /* 3. Battery takes full bottom row */
+    .battery-status-container {
+        order: 3;
+        flex: 1 1 100%; 
+        width: 100%;
+        margin-top: 5px;
+        justify-content: center;
+    }
+
+    .battery-bar {
+        width: 100%; 
+        max-width: 250px; 
+    }
+}

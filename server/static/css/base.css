@@ -1,0 +1,115 @@
+:root {
+    --color-bg: #0d0d0d;
+    --color-bg-transparent: rgba(13, 13, 13, 0.95);
+    --color-primary: #00ff00;
+    --color-primary-dim: rgba(0, 255, 0, 0.2);
+    --color-secondary: #0088ff;
+    --color-red: #ff3333;
+    --color-text: #ffffff;
+    --font-stack: 'Share Tech Mono', 'Courier New', monospace;
+    --border-radius: 6px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--color-bg);
+    color: var(--color-primary);
+    font-family: var(--font-stack);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    overflow: hidden; 
+    font-size: 16px;
+}
+
+/* Base Inputs & Buttons */
+input, button {
+    font-family: var(--font-stack);
+    font-size: 1rem;
+    padding: 12px;
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 400px;
+    margin: 10px 0;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+input {
+    background: #1a1a1a;
+    border: 2px solid var(--color-primary);
+    color: var(--color-text);
+    text-align: center;
+    text-transform: uppercase;
+}
+
+input:focus {
+    box-shadow: 0 0 15px var(--color-primary);
+    background: #222;
+}
+
+button {
+    background: var(--color-primary-dim);
+    border: 2px solid var(--color-primary);
+    color: var(--color-primary);
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+button:hover {
+    background: var(--color-primary);
+    color: #000;
+    box-shadow: 0 0 20px var(--color-primary);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: #555;
+    color: #888;
+    box-shadow: none;
+}
+
+/* Utility Classes */
+.screen {
+    display: none;
+    height: 100vh;
+    width: 100vw;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-md);
+    overflow-y: auto;
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #111;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 4px;
+}
+
+/* Global Responsive Adjustments */
+@media (max-width: 600px) {
+    body { font-size: 14px; }
+    input, button { padding: 10px; }
+    .screen { padding: 10px;
+    }
+
+}

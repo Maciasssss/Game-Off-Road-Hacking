@@ -1,0 +1,309 @@
+/* ==================== ENERGY BAR FILL ANIMATIONS ==================== */
+/* Based on hacking speed (FAST, NORMAL, SLOW) */
+
+/* === FAST FILL (< 3 seconds) === */
+/* Perfect hack - Maximum energy gain (100%) */
+@keyframes fill-energy-fast {
+    0% {
+        width: 0%;
+        opacity: 0;
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0);
+    }
+    10% {
+        opacity: 1;
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.8), inset 0 0 10px rgba(0, 255, 0, 0.3);
+    }
+    100% {
+        width: 100%;
+        opacity: 1;
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.6), inset 0 0 8px rgba(0, 255, 0, 0.2);
+    }
+}
+
+/* === NORMAL FILL (3-8 seconds) === */
+/* Good hack - Medium energy gain (60%) */
+@keyframes fill-energy-normal {
+    0% {
+        width: 0%;
+        opacity: 0;
+        box-shadow: 0 0 5px rgba(0, 255, 0, 0);
+    }
+    5% {
+        opacity: 1;
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
+    }
+    50% {
+        width: 30%;
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+    }
+    100% {
+        width: 60%;
+        opacity: 1;
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.4), inset 0 0 5px rgba(0, 255, 0, 0.15);
+    }
+}
+
+/* === SLOW FILL (> 8 seconds) === */
+/* Poor hack - Low energy gain (30%) */
+@keyframes fill-energy-slow {
+    0% {
+        width: 0%;
+        opacity: 0;
+        box-shadow: 0 0 0 rgba(0, 255, 0, 0);
+    }
+    3% {
+        opacity: 0.7;
+        box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
+    }
+    50% {
+        width: 15%;
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+    }
+    100% {
+        width: 30%;
+        opacity: 1;
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    }
+}
+
+/* === FAILED FILL === */
+/* No energy gain - Red warning flash */
+@keyframes fill-energy-failed {
+    0%, 100% {
+        background: #cc0000;
+        box-shadow: 0 0 5px rgba(255, 51, 51, 0.3);
+    }
+    50% {
+        background: #ff3333;
+        box-shadow: 0 0 15px rgba(255, 51, 51, 0.6);
+    }
+}
+
+/* === ENERGY BAR CLASSES === */
+
+/* Apply animation based on speed category */
+.energy-fill.fast {
+    animation: fill-energy-fast 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+
+.energy-fill.normal {
+    animation: fill-energy-normal 2.5s ease-out forwards !important;
+}
+
+.energy-fill.slow {
+    animation: fill-energy-slow 4.0s ease-in-out forwards !important;
+}
+
+.energy-fill.failed {
+    animation: fill-energy-failed 1.0s ease-in-out 3 !important;
+}
+
+/* === GLOW PULSE FOR FAST/PERFECT === */
+@keyframes pulse-glow-energy {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.4), inset 0 0 5px rgba(0, 255, 0, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.8), inset 0 0 10px rgba(0, 255, 0, 0.3);
+    }
+}
+
+.energy-fill.fast.charged {
+    animation: pulse-glow-energy 1.5s ease-in-out infinite;
+}
+
+/* === TEXT FEEDBACK === */
+.energy-status-text {
+    font-size: clamp(10px, 2vw, 14px);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.energy-status-text.fast {
+    color: #00ff00;
+    text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+    animation: pulse-text 0.6s ease-in-out 2;
+}
+
+.energy-status-text.normal {
+    color: #00ff00;
+    text-shadow: 0 0 8px #00ff00;
+}
+
+.energy-status-text.slow {
+    color: #ffaa00;
+    text-shadow: 0 0 8px #ffaa00;
+}
+
+.energy-status-text.failed {
+    color: #ff3333;
+    text-shadow: 0 0 10px #ff3333;
+    animation: pulse-danger 0.5s ease-in-out 2;
+}
+
+/* === SPEED INDICATOR === */
+@keyframes speed-indicator-pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.speed-indicator {
+    display: inline-block;
+    padding: clamp(4px, 1vw, 8px) clamp(8px, 2vw, 12px);
+    border-radius: 4px;
+    font-size: clamp(9px, 1.5vw, 11px);
+    font-weight: bold;
+    text-transform: uppercase;
+    animation: speed-indicator-pulse 1s ease-in-out infinite;
+}
+
+.speed-indicator.fast {
+    background: rgba(0, 255, 0, 0.2);
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.speed-indicator.normal {
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid #00aa00;
+    color: #00aa00;
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+}
+
+.speed-indicator.slow {
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px solid #ffaa00;
+    color: #ffaa00;
+    box-shadow: 0 0 5px rgba(255, 170, 0, 0.3);
+}
+
+.speed-indicator.failed {
+    background: rgba(255, 51, 51, 0.2);
+    border: 1px solid #ff3333;
+    color: #ff3333;
+    box-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+}
+
+/* === TIMING DISPLAY === */
+.hack-timing-display {
+    display: flex;
+    gap: clamp(8px, 2vw, 12px);
+    align-items: center;
+    justify-content: center;
+    margin-top: clamp(8px, 2vw, 12px);
+    font-size: clamp(10px, 1.8vw, 12px);
+    color: #00ff00;
+}
+
+.hack-timing-display .label {
+    color: #00aa00;
+    font-weight: bold;
+}
+
+.hack-timing-display .value {
+    color: #00ff00;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+}
+
+/* === ENERGY GAIN TOOLTIP === */
+@keyframes float-tooltip {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    10% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    90% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+.energy-gain-tooltip {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: clamp(10px, 2vw, 15px) clamp(15px, 3vw, 20px);
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #00ff00;
+    border-radius: 8px;
+    color: #00ff00;
+    font-size: clamp(14px, 3vw, 18px);
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+    text-shadow: 0 0 10px #00ff00;
+    pointer-events: none;
+    animation: float-tooltip 2s ease-in-out forwards;
+}
+
+.energy-gain-tooltip.fast {
+    border-color: #00ff00;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
+    animation: float-tooltip 1.5s ease-in-out forwards;
+}
+
+.energy-gain-tooltip.normal {
+    border-color: #00ff00;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+    animation: float-tooltip 2.5s ease-in-out forwards;
+}
+
+.energy-gain-tooltip.slow {
+    border-color: #ffaa00;
+    color: #ffaa00;
+    box-shadow: 0 0 15px rgba(255, 170, 0, 0.5);
+    text-shadow: 0 0 8px #ffaa00;
+    animation: float-tooltip 4s ease-in-out forwards;
+}
+
+.energy-gain-tooltip.failed {
+    border-color: #ff3333;
+    color: #ff3333;
+    box-shadow: 0 0 20px rgba(255, 51, 51, 0.6);
+    text-shadow: 0 0 10px #ff3333;
+}
+
+/* === RESPONSIVE ENERGY BAR === */
+@media (max-width: 480px) {
+    .energy-fill.fast {
+        animation: fill-energy-fast 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+    }
+    
+    .energy-fill.normal {
+        animation: fill-energy-normal 2s ease-out forwards !important;
+    }
+    
+    .energy-fill.slow {
+        animation: fill-energy-slow 3s ease-in-out forwards !important;
+    }
+}
+
+@media (max-height: 600px) {
+    .energy-gain-tooltip {
+        top: 15%;
+        font-size: clamp(12px, 2.5vw, 14px);
+        padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2vw, 15px);
+    }
+}
