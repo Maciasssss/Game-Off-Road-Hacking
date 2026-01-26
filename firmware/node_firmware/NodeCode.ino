@@ -1,24 +1,24 @@
 /*
  * ======================================================================================
  * PROJECT:      CYBER-WAR (RFID Capture the Flag)
- * FILE:         NodeFirmware.ino
+ * FILE:         NodeCode.ino (Low-Level WebSocket Implementation)
  * HARDWARE:     ESP8266 (NodeMCU/Wemos), RC522 RFID, SSD1306 OLED (I2C)
- * AUTHOR:       [Maciej/Maciasssss]
- * DESCRIPTION:  IoT Node firmware that handles RFID scanning, bidirectional 
- *               WebSocket communication, and OLED status updates.
+ * AUTHOR:       [Macieasssss]
+ * DESCRIPTION:  IoT Node firmware that handles RFID scanning and bidirectional 
+ *               communication with a modern Flask-SocketIO server (Engine.IO v4).
+ * 
  * ======================================================================================
  * 
  * REQUIRED LIBRARIES (Install via Arduino Library Manager):
  * 1. MFRC522        by GithubCommunity
  * 2. Adafruit GFX   by Adafruit
  * 3. Adafruit SSD1306 by Adafruit
- * 4. SocketIoClient by Markus Sattler
- * 5. WebSockets     by Markus Sattler
- * 6. ArduinoJson    by Benoit Blanchon
+ * 4. WebSockets     by Markus Sattler (Version 2.4.1 or newer)
+ * ======================================================================================
  */
 
 #include <ESP8266WiFi.h>
-#include <SocketIoClient.h>
+#include <WebSocketsClient.h> // Core WebSocket library
 #include <SPI.h>
 #include <MFRC522.h>
 #include <Wire.h>
@@ -34,7 +34,7 @@ const char* WIFI_SSID = "YOUR_WIFI_NAME";      // <--- CHANGE THIS
 const char* WIFI_PASS = "YOUR_WIFI_PASSWORD";  // <--- CHANGE THIS
 
 // 2. Game Server Configuration
-// IP Address of the computer running app.py (Run 'ipconfig' or 'ifconfig' on PC to find it)
+// IP Address of the computer running app.py (Run 'ipconfig' on Windows to find it)
 const char* SERVER_IP = "192.168.1.X";         // <--- CHANGE THIS
 const int   SERVER_PORT = 5000;
 
@@ -55,48 +55,39 @@ const String NODE_ID = "node_alpha";           // <--- CHANGE THIS FOR EACH BOAR
 // SCL -> D1 (GPIO 5)
 // SDA -> D2 (GPIO 4)
 #define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 64  // Standard 0.96" OLED is 128x64 (Changed from 32 for better visibility)
-#define OLED_RESET    -1  // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_HEIGHT 64  
+#define OLED_RESET    -1  
 
 // ======================================================================================
 // [GLOBAL OBJECTS]
 // ======================================================================================
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-SocketIoClient socket;
+WebSocketsClient webSocket;
 MFRC522 mfrc522(SS_PIN, RST_PIN);
+
+bool isConnected = false;
 
 // ======================================================================================
 // [DISPLAY HELPER FUNCTIONS]
 // ======================================================================================
 
-/**
- * Updates the OLED screen with centered text.
- * @param title    Main text (Large font)
- * @param subtitle Secondary text (Small font)
- * @param inverted If true, displays black text on white background
- */
 void updateDisplay(String title, String subtitle = "", bool inverted = false) {
   display.clearDisplay();
   
   if (inverted) display.fillScreen(SSD1306_WHITE);
   
-  // Set text color
   display.setTextColor(inverted ? SSD1306_BLACK : SSD1306_WHITE);
 
-  // --- Draw Title (Large) ---
+  // Title
   display.setTextSize(2);
-  int16_t x1, y1;
-  uint16_t w, h;
-  display.getTextBounds(title, 0, 0, &x1, &y1, &w, &h);
-  display.setCursor((SCREEN_WIDTH - w) / 2, 10);
+  display.setCursor(0, 10); // Left aligned for simplicity
   display.println(title);
 
-  // --- Draw Subtitle (Small) ---
+  // Subtitle
   if (subtitle != "") {
     display.setTextSize(1);
-    display.getTextBounds(subtitle, 0, 0, &x1, &y1, &w, &h);
-    display.setCursor((SCREEN_WIDTH - w) / 2, 35); // Adjusted Y for 64px height
+    display.setCursor(0, 35);
     display.println(subtitle);
   }
 
@@ -104,52 +95,86 @@ void updateDisplay(String title, String subtitle = "", bool inverted = false) {
 }
 
 // ======================================================================================
-// [SOCKET.IO EVENT HANDLERS]
+// [SOCKET.IO MANUAL PROTOCOL HANDLING]
 // ======================================================================================
 
 /**
- * Triggered when ESP connects to the Python Server
+ * Sends a Socket.IO Event (Type 42)
+ * Format: 42["event_name", {json_data}]
  */
-void onConnect(const char * payload, size_t length) {
-  Serial.println("[SOCKET] Connected to Server!");
-  
-  // 1. Register this node's identity with the server
-  String regData = "{\"node_id\":\"" + NODE_ID + "\"}";
-  socket.emit("register_node", regData.c_str());
-
-  // 2. Set default screen based on role
-  if (NODE_ID == "base_station") {
-    updateDisplay("BASE", "Ready to Charge");
-  } else {
-    updateDisplay("SYSTEM", "Online & Active");
-  }
+void sendSocketIOEvent(String eventName, String jsonPayload) {
+  String msg = "42[\"" + eventName + "\"," + jsonPayload + "]";
+  webSocket.sendTXT(msg);
 }
 
 /**
- * Triggered when Server sends a visual update command
- * Payload examples: "RED", "BLUE", "HACK", "NEUTRAL"
+ * Main WebSocket Event Handler
+ * Parses raw text messages from the server to handle Socket.IO handshakes and events.
  */
-void onScreenUpdate(const char * payload, size_t length) {
-  String msg = String(payload);
-  msg.replace("\"", ""); // Clean up JSON quotes
-  
-  Serial.print("[COMMAND] Screen Update: ");
-  Serial.println(msg);
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+  String text = (char*)payload;
 
-  if (msg == "RED") {
-    updateDisplay("RED TEAM", "Captured", false); // Regular
-  } else if (msg == "BLUE") {
-    updateDisplay("BLUE TEAM", "Captured", false);
-  } else if (msg == "HACK") {
-    updateDisplay("HACKING", "In Progress...", true); // Inverted flash effect
-  } else if (msg == "NEUTRAL") {
-    updateDisplay("NEUTRAL", "Scan to Hack");
-  } else if (msg == "CHARGED") {
-    updateDisplay("BATTERY", "FULL POWER!");
-    delay(2000); 
-    updateDisplay("BASE", "Ready to Charge");
-  } else if (msg == "WAIT") {
-    updateDisplay("WAIT", "Game Not Started");
+  switch(type) {
+    case WStype_DISCONNECTED:
+      Serial.println("[WS] Disconnected!");
+      isConnected = false;
+      updateDisplay("ERROR", "No Server Conn");
+      break;
+
+    case WStype_CONNECTED:
+      Serial.println("[WS] Connected to Server! Waiting for handshake...");
+      break;
+
+    case WStype_TEXT:
+      // --- PACKET TYPE ANALYSIS ---
+      
+      // Type "0": Open/Handshake -> We must reply with "40" to connect to namespace
+      if (text.startsWith("0")) {
+        Serial.println("[WS] Handshake received. Sending Connect packet...");
+        webSocket.sendTXT("40"); 
+      }
+      
+      // Type "40": Connected to Namespace -> We are officially logged in
+      else if (text.startsWith("40")) {
+        Serial.println("[WS] Logged in! Registering Node...");
+        isConnected = true;
+        
+        // Register node identity
+        String json = "{\"node_id\":\"" + NODE_ID + "\"}";
+        sendSocketIOEvent("register_node", json);
+
+        if (NODE_ID == "base_station") updateDisplay("BASE", "Ready");
+        else updateDisplay("SYSTEM", "Online");
+      }
+      
+      // Type "42": Event Message -> ["event_name", data]
+      else if (text.startsWith("42")) {
+        Serial.println("[WS] Event: " + text);
+        
+        // Simple string parsing to avoid JSON overhead for simple commands
+        if (text.indexOf("update_screen") > 0) {
+            String msg = "";
+            if (text.indexOf("RED") > 0) msg = "RED";
+            else if (text.indexOf("BLUE") > 0) msg = "BLUE";
+            else if (text.indexOf("HACK") > 0) msg = "HACK";
+            else if (text.indexOf("NEUTRAL") > 0) msg = "NEUTRAL";
+            else if (text.indexOf("CHARGED") > 0) msg = "CHARGED";
+            else if (text.indexOf("WAIT") > 0) msg = "WAIT";
+
+            if (msg == "RED") updateDisplay("RED TEAM", "Captured");
+            else if (msg == "BLUE") updateDisplay("BLUE TEAM", "Captured");
+            else if (msg == "HACK") updateDisplay("HACKING", "In Progress...", true);
+            else if (msg == "NEUTRAL") updateDisplay("FREE", "Scan to Hack");
+            else if (msg == "CHARGED") updateDisplay("ENERGY", "Full Power!");
+            else if (msg == "WAIT") updateDisplay("WAIT", "Game Paused");
+        }
+      }
+      
+      // Type "2": Ping -> We must reply with "3" (Pong) to keep connection alive
+      else if (text.startsWith("2")) {
+        webSocket.sendTXT("3");
+      }
+      break;
   }
 }
 
@@ -160,38 +185,35 @@ void onScreenUpdate(const char * payload, size_t length) {
 void setup() {
   Serial.begin(115200);
   
-  // 1. Initialize OLED Display
-  // Address 0x3C is standard for 128x64 OLEDs
+  // 1. Initialize OLED
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { 
-    Serial.println(F("[ERROR] OLED Allocation Failed"));
-    for(;;); // Halt execution
+    Serial.println(F("[ERROR] OLED Init Failed"));
+    for(;;);
   }
-  updateDisplay("BOOTING...", "Init Hardware");
-  delay(1000);
+  updateDisplay("BOOT...", "Init Hardware");
 
   // 2. Initialize WiFi
   WiFi.begin(WIFI_SSID, WIFI_PASS);
-  Serial.print("Connecting to WiFi");
+  Serial.print("Connecting WiFi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println();
-  Serial.print("IP: ");
-  Serial.println(WiFi.localIP());
   updateDisplay("WIFI OK", WiFi.localIP().toString());
   delay(1000);
 
-  // 3. Initialize Socket.IO
-  socket.on("connect", onConnect);
-  socket.on("update_screen", onScreenUpdate);
-  socket.begin(SERVER_IP, SERVER_PORT);
+  // 3. Initialize WebSocket (Manual Engine.IO v4 URL)
+  // The query parameters "EIO=4" and "transport=websocket" are crucial for Flask-SocketIO 5.x
+  webSocket.begin(SERVER_IP, SERVER_PORT, "/socket.io/?EIO=4&transport=websocket");
+  webSocket.onEvent(webSocketEvent);
+  
+  // Keep-alive settings
+  webSocket.setReconnectInterval(5000);
+  webSocket.enableHeartbeat(15000, 3000, 2);
 
   // 4. Initialize RFID
   SPI.begin();
   mfrc522.PCD_Init();
-  
-  updateDisplay("READY", "Waiting for Server...");
 }
 
 // ======================================================================================
@@ -199,14 +221,16 @@ void setup() {
 // ======================================================================================
 
 void loop() {
-  // Keep socket connection alive
-  socket.loop();
+  webSocket.loop();
 
-  // Look for new RFID cards
+  // Only scan if connected to server
+  if (!isConnected) return;
+
+  // RFID Scan Check
   if (!mfrc522.PICC_IsNewCardPresent()) return;
   if (!mfrc522.PICC_ReadCardSerial()) return;
 
-  // Convert UID bytes to Hex String (e.g., "E2A5C9")
+  // Convert UID to Hex String
   String cardUid = "";
   for (byte i = 0; i < mfrc522.uid.size; i++) {
     if (mfrc522.uid.uidByte[i] < 0x10) cardUid += "0";
@@ -214,27 +238,21 @@ void loop() {
   }
   cardUid.toUpperCase();
   
-  Serial.print("[RFID] Scanned: ");
-  Serial.println(cardUid);
-
-  // Visual Feedback for User
-  if (NODE_ID != "base_station") {
-    updateDisplay("SCANNING...", "Transmitting Data", true);
-  } else {
-    updateDisplay("CHARGING...", "Standby", true);
-  }
-
-  // Send Data to Python Server
-  String jsonPayload = "{\"uid\":\"" + cardUid + "\", \"node_id\":\"" + NODE_ID + "\"}";
-  socket.emit("rfid_scan", jsonPayload.c_str());
-
-  // Stop reading the card and add delay to prevent spamming
-  mfrc522.PICC_HaltA();
-  delay(1000); 
+  Serial.println("[RFID] Tag: " + cardUid);
   
-  // Revert screen to previous state logic is handled by server "update_screen" events,
-  // but we can default to Base status if we are the base.
-  if (NODE_ID == "base_station") {
-      updateDisplay("BASE", "Ready to Charge");
-  }
+  // Instant visual feedback before server reply
+  if (NODE_ID == "base_station") updateDisplay("CHARGING", "...", true);
+  else updateDisplay("SCANNING", "Sending Data", true);
+
+  // Send Data to Server
+  String json = "{\"uid\":\"" + cardUid + "\",\"node_id\":\"" + NODE_ID + "\"}";
+  sendSocketIOEvent("rfid_scan", json);
+
+  // Halt card to prevent multi-read
+  mfrc522.PICC_HaltA();
+  delay(1000);
+  
+  // Revert to default screen (unless server overrides)
+  if (NODE_ID == "base_station") updateDisplay("BASE", "Ready");
+  else updateDisplay("SYSTEM", "Active");
 }
