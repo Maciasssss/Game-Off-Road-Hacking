@@ -3,7 +3,7 @@
  * PROJECT:      CYBER-WAR (RFID Capture the Flag)
  * FILE:         NodeFirmware.ino
  * HARDWARE:     ESP8266 (NodeMCU/Wemos), RC522 RFID, SSD1306 OLED (I2C)
- * AUTHOR:       [Your Name/GitHub Username]
+ * AUTHOR:       [Maciej/Maciasssss]
  * DESCRIPTION:  IoT Node firmware that handles RFID scanning, bidirectional 
  *               WebSocket communication, and OLED status updates.
  * ======================================================================================
