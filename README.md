@@ -280,7 +280,7 @@ The code contains hardcoded UIDs for these items (variables r1, r2, b1, b2). You
 5. Copy these UIDs and replace the values in app.py:
 ```cpp
 CARD_MAPPING = {
-    "77286D06": "R1", "55AE6C06": "R2", "16CA3253": "B1", "A6636D06": "B2"
+    "Place_card_UID_here": "R1", "Place_card_UID_here": "R2", "Place_card_UID_here": "B1", "Place_card_UID_here": "B2"
 }
 ```
 ### 3. Upload to ESP8266
