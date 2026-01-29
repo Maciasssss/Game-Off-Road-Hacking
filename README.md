@@ -244,17 +244,17 @@ Program each ESP8266 to communicate with the game server.
 4. Install required libraries:
    - Go to **Tools → Manage Libraries**
    - Install the following:
-     - `MFRC522` by GithubCommunity
-     - `Adafruit SSD1306`
-     - `Adafruit GFX Library`
-     - `ArduinoJson`
-     - `SocketIoClient` by Markus Sattler
+     - `MFRC522` by GithubCommunity v.1.4.12
+     - `Adafruit SSD1306` v.2.5.16
+     - `Adafruit GFX Library` v.1.12.14
+     - `ArduinoJson` v.7.4.2
+     - `SocketIoClient` by Vincent Wyszynski v.0.3.0
 
 </details>
 
 ### 2. Configure Node Code
 
-Open `NodeCode.ino` from the `/arduino` folder and modify:
+A. Open `NodeCode.ino` from the `/arduino` folder and modify:
 
 ```cpp
 // WiFi credentials
@@ -268,7 +268,21 @@ int port = 5000;
 // Node identifier (change for each board)
 String nodeId = "node_alpha";  // Options: node_alpha, node_beta, node_gamma, base_station
 ```
+B. RFID "Nugget" Configuration (Critical!)
+The game uses 4 specific physical RFID tags as "Nuggets" (Red 1, Red 2, Blue 1, Blue 2). 
+The code contains hardcoded UIDs for these items (variables r1, r2, b1, b2). You must update them to match your physical tags.
 
+**How to find your Tag IDs:**
+1. Upload the code to the ESP8266 (see Step 3 below).
+2. Open Tools → Serial Monitor (set baud rate to 115200).
+3. Scan your RFID tags one by one.
+4. The Serial Monitor will print the UID of the scanned tag (e.g., UID: 34 C5 11 A2).
+5. Copy these UIDs and replace the values in app.py:
+```cpp
+CARD_MAPPING = {
+    "77286D06": "R1", "55AE6C06": "R2", "16CA3253": "B1", "A6636D06": "B2"
+}
+```
 ### 3. Upload to ESP8266
 
 | Node | nodeId Value | Purpose |
